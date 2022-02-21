@@ -12,7 +12,7 @@ app.listen(
 )
 
 app.get('/', (req, res) => {
-    res.status(200).send('Hello Shahry !');
+    res.status(200).send({"msg":"Hello Shahry !"});
 })
 app.get('/:egpID', (req, res) => {
     //validate first
@@ -125,6 +125,7 @@ function extractBirthDate(birthDate, century) {
     (century == 2) ? year += 1900 : year += 2000;
     var month = Number(birthDate.substring(2, 4));
     var day = Number(birthDate.substring(4, 6));
+    console.log(year, month, day , "henaaa  ", new Date(year, month - 1, day + 1).toDateString());
 
-    return new Date(year, month - 1, day + 1).getDate();
+    return new Date(year, month - 1, day + 1).toDateString();
 }
