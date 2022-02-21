@@ -2,7 +2,7 @@
 // import Toolbar from '@mui/material/Toolbar'
 // import Typography from '@mui/material/Typography'
 const app = require('express')();
-const PORT = 3000;
+const PORT = 8000;
 var govList = require('./governates.json');
 
 
@@ -16,57 +16,61 @@ app.get('/', (req, res) => {
 })
 //----------------------------verify the ID-----------------------------
 app.get('/:egpID', (req, res) => {
-
-    const egpID = req.params.egpID;
-    // var verified = true;
     var myStatus = 200;
-    var myMsg = "all good here";
+    var validMsg = "Valid";
+    if (!(verifyID(req.params.egpID))) {
+        myStatus = 400;
+        validMsg = "Invalid"
+    }
+    res.status(myStatus).send(validMsg);
+    // res.write(egpID);
+    res.end();
+});
+
+function verifyID(egpID) {
     //verify length
     if (egpID.length === 14) {
         //extracting parts
         var century = Number(egpID.substring(0, 1));
         var birthDate = egpID.substring(1, 7);
         var gov = egpID.substring(7, 9);
-        var gender = Number(egpID.substring(9, 13));
+        var gender = egpID.substring(9, 13); //remove
         var check = Number(egpID.substring(13, 14));
+        console.log(century,
+            birthDate,
+            gov,
+            gender,
+            check);
 
-
-
-        if (!(govList.hasOwnProperty(gov))        ) {
-            myStatus = 400;
-            myMsg = "Invalid national ID - gov";
+        if (!(govList.hasOwnProperty(gov))) {
+            console.log("  Invalid national ID - gov");
+            return false;
         }
-        if(century <2 || century>3){
-            myStatus = 400;
-            myMsg = "Invalid national ID - century";
+        if (century < 2 || century > 3) {
+            console.log("  Invalid national ID - century");
+            return false;
         }
-        if (!verifyBirthDate(birthDate)) {
-            myStatus = 400;
-            myMsg = "Invalid national ID - birthdate";
+        if (!verifyBirthDate(birthDate, century)) {
+            console.log("   Invalid national ID - birthdate");
+            return false;
         }
-
-        //todo - gender, checkInteger
-
+        if (check < 1) {
+            console.log("  Invalid national ID - check integer");
+            return false;
+        }
     }
     else {
-        myStatus = 400;
-        myMsg = "National ID should be 13 numbers";
-    }
-    console.log(century,
-        birthDate,
-        gov,
-        gender,
-        check);
-    res.status(myStatus).send(myMsg);
+        return false;
+    } 
+    return true;
 
-
-});
-
-function verifyBirthDate(birthDate) {
+}
+function verifyBirthDate(birthDate, century) {
     var year = Number(birthDate.substring(0, 2));
+    (century == 2)? year+=1900: year+=2000;
     var month = Number(birthDate.substring(2, 4));
     var day = Number(birthDate.substring(4, 6));
-    console.log("dd/mm/yy", day,month,year);
+    // console.log("dd/mm/yy", day, month, year);
     if (day < 1)
         return false;
     switch (month) {
@@ -101,9 +105,19 @@ function verifyBirthDate(birthDate) {
         default: //month out of range
             return false;
     }
+    //verify older than 16 yrs
+    var sixteen = year +16;
+    var sixteenDate = new Date(sixteen, month, day);
+    var today = new Date();
+    if (sixteenDate > today) {
+        console.log("less than 16", sixteenDate);
+        return false;
+    }
+
     return true;
 
 }
+//      todo
 //-------------------------------view all info--------------------------------
 app.get('/:egpID/info', (req, res) => {
 
