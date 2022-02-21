@@ -17,11 +17,11 @@ app.get('/', (req, res) => {
 app.get('/:egpID', (req, res) => {
     //validate first
     var myStatus = 200;
-    var myMsg = "Valid";
+    var myMsg = {};
     var egpID = req.params.egpID;
     if (!(verifyID(egpID))) {
         myStatus = 400;
-        myMsg = "Invalid"
+        myMsg = {"isValid" : "No"}
     }
     else {
         //extracting parts
@@ -30,6 +30,7 @@ app.get('/:egpID', (req, res) => {
         var gov = egpID.substring(7, 9) + "";
         var gender = egpID.substring(12, 13);
         myMsg = {
+            "isValid" : "Yes",
             "birthDate": extractBirthDate(birthDate, century),
             "birthGov": govList[gov],
             "gender": (gender % 2 === 0) ? "F" : "M",

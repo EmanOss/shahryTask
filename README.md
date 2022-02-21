@@ -10,17 +10,18 @@ Egyptian national ID validator & data extractor
 ```
 npm install
 ``` 
-4. To start the api 
+4. To start the API 
 ```
 node .
 ```
 5. Open browser to http://localhost:8000/
-6. To validate the national ID, add it after the slash like this: http://localhost:8000/30602200102301
-7. To extract info add "info" after the ID like this: http://localhost:8000/30602200102301/info
+6. To validate and extract info from the national ID, add it after the slash like this: http://localhost:8000/30602200102301
+7. output is returned as a JSON object
 
 ## The logic
+- The ID is divided into partitions
 
 
 ## About
 
-This api was built using JavaScript(node)
+This API was built using JavaScript(node)
