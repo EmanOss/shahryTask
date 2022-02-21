@@ -17,14 +17,13 @@ app.get('/', (req, res) => {
 //----------------------------verify the ID-----------------------------
 app.get('/:egpID', (req, res) => {
     var myStatus = 200;
+    // console.log("1sttttt");
     var validMsg = "Valid";
     if (!(verifyID(req.params.egpID))) {
         myStatus = 400;
         validMsg = "Invalid"
     }
     res.status(myStatus).send(validMsg);
-    // res.write(egpID);
-    res.end();
 });
 
 function verifyID(egpID) {
@@ -34,14 +33,8 @@ function verifyID(egpID) {
         var century = Number(egpID.substring(0, 1));
         var birthDate = egpID.substring(1, 7);
         var gov = egpID.substring(7, 9);
-        var gender = egpID.substring(9, 13); //remove
+        // var gender = egpID.substring(9, 13); //remove
         var check = Number(egpID.substring(13, 14));
-        console.log(century,
-            birthDate,
-            gov,
-            gender,
-            check);
-
         if (!(govList.hasOwnProperty(gov))) {
             console.log("  Invalid national ID - gov");
             return false;
@@ -63,7 +56,6 @@ function verifyID(egpID) {
         return false;
     } 
     return true;
-
 }
 function verifyBirthDate(birthDate, century) {
     var year = Number(birthDate.substring(0, 2));
@@ -92,7 +84,8 @@ function verifyBirthDate(birthDate, century) {
                 return false;
             break;
         case 02:
-            if ((year % 4 === 0 && year % 100 !== 0) || (year % 4 === 0 && year % 100 === 0 && year % 400 === 0)) {
+            if ((year % 4 === 0 && year % 100 !== 0) 
+            || (year % 4 === 0 && year % 100 === 0 && year % 400 === 0)) {
                 if (day > 29)
                     return false;
                 break;
@@ -107,7 +100,7 @@ function verifyBirthDate(birthDate, century) {
     }
     //verify older than 16 yrs
     var sixteen = year +16;
-    var sixteenDate = new Date(sixteen, month, day);
+    var sixteenDate = new Date(sixteen, month-1, day+1);
     var today = new Date();
     if (sixteenDate > today) {
         console.log("less than 16", sixteenDate);
@@ -117,8 +110,35 @@ function verifyBirthDate(birthDate, century) {
     return true;
 
 }
-//      todo
-//-------------------------------view all info--------------------------------
+//-------------------------------extract info--------------------------------
 app.get('/:egpID/info', (req, res) => {
-
+    //validate first
+    var myStatus = 200;
+    var myMsg = "Valid";
+    var egpID = req.params.egpID;
+    // console.log("2nddddd");
+    if (!(verifyID(egpID))) {
+        myStatus = 400;
+        myMsg = "Invalid"
+    }
+    //extracting parts
+    var century = Number(egpID.substring(0, 1));
+    var birthDate = egpID.substring(1, 7);
+    var gov = egpID.substring(7, 9)+"";
+    var gender = egpID.substring(12, 13);
+    // var check = Number(egpID.substring(13, 14));
+    myMsg = {
+        "birthDate" : extractBirthDate(birthDate, century),
+        "birthGov" : govList[gov],
+        "gender" : (gender%2===0)?"F":"M",
+    };
+    res.status(myStatus).send(myMsg);
 });
+function extractBirthDate(birthDate, century){
+    var year = Number(birthDate.substring(0, 2));
+    (century == 2)? year+=1900: year+=2000;
+    var month = Number(birthDate.substring(2, 4));
+    var day = Number(birthDate.substring(4, 6));
+
+    return new Date(year,month-1,day+1).getDate();
+}
