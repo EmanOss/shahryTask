@@ -1,6 +1,3 @@
-// import AppBar from '@mui/material/AppBar'
-// import Toolbar from '@mui/material/Toolbar'
-// import Typography from '@mui/material/Typography'
 const app = require('express')();
 const PORT = 8000;
 var govList = require('./governates.json');
@@ -8,7 +5,7 @@ var govList = require('./governates.json');
 
 app.listen(
     PORT,
-    () => console.log(`hey there http://localhost:${PORT}`)
+    () => console.log(`Live on http://localhost:${PORT}`)
 )
 
 app.get('/', (req, res) => {
@@ -113,7 +110,7 @@ function verifyBirthDate(birthDate, century) {
     var sixteenDate = new Date(sixteen, month - 1, day + 1);
     var today = new Date();
     if (sixteenDate > today) {
-        console.log("less than 16", sixteenDate);
+        // console.log("less than 16", sixteenDate);
         return false;
     }
 
@@ -125,7 +122,6 @@ function extractBirthDate(birthDate, century) {
     (century == 2) ? year += 1900 : year += 2000;
     var month = Number(birthDate.substring(2, 4));
     var day = Number(birthDate.substring(4, 6));
-    console.log(year, month, day , "henaaa  ", new Date(year, month - 1, day + 1).toDateString());
 
     return new Date(year, month - 1, day + 1).toDateString();
 }
